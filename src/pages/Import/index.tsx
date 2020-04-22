@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 
 import filesize from 'filesize';
 
+import fileSize from 'filesize';
 import Header from '../../components/Header';
 import FileList from '../../components/FileList';
 import Upload from '../../components/Upload';
@@ -23,19 +24,32 @@ const Import: React.FC = () => {
   const history = useHistory();
 
   async function handleUpload(): Promise<void> {
-    // const data = new FormData();
-
-    // TODO
+    const data = new FormData();
 
     try {
-      // await api.post('/transactions/import', data);
+      uploadedFiles.map(async upload => {
+        data.set('file', upload.file, upload.name);
+
+        await api.post('/transactions/import', data);
+      });
+
+      setUploadedFiles([]);
+
+      history.push('/');
     } catch (err) {
-      // console.log(err.response.error);
+      console.log(err.response.error);
     }
   }
 
   function submitFile(files: File[]): void {
-    // TODO
+    const fileList: FileProps[] = files.map(file => {
+      return {
+        file,
+        name: file.name,
+        readableSize: fileSize(file.size),
+      };
+    });
+    setUploadedFiles(fileList);
   }
 
   return (
